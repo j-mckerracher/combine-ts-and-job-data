@@ -382,9 +382,16 @@ def main():
 
         logger.info(f"Found {len(periods)} unique year-month periods to process")
 
+        # Filter out 2015_03 and 2015_04
+        filtered_periods = [(year, month) for year, month in periods
+                            if not (year == 2015 and month in [3, 4])]
+
+        skipped = len(periods) - len(filtered_periods)
+        logger.info(f"Skipping {skipped} periods (2015_03 and 2015_04)")
+
         # Process each year-month combination
         successful = 0
-        for year, month in sorted(periods):
+        for year, month in sorted(filtered_periods):
             if process_year_month(year, month,
                                   timeseries_bucket,
                                   job_bucket,
@@ -392,7 +399,7 @@ def main():
                                   temp_dir):
                 successful += 1
 
-        logger.info(f"Completed processing {successful}/{len(periods)} periods")
+        logger.info(f"Completed processing {successful}/{len(filtered_periods)} periods")
 
 
 if __name__ == "__main__":
